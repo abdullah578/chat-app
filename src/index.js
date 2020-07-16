@@ -10,6 +10,9 @@ const port = process.env.PORT || 3000;
 
 const publicPath = path.join(__dirname, "../public");
 app.use(express.static(publicPath));
+io.on("connection", () => {
+  console.log("Connected");
+});
 
 server.listen(port, () => {
   console.log(`Server is up and running on port ${port}`);
