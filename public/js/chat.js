@@ -4,14 +4,22 @@ const elements = {
   locationButton: document.querySelector(".location"),
   messageTemplate: document.querySelector("#message-template"),
   messageList: document.querySelector("#message-list"),
+  locationTemplate: document.querySelector("#location-template"),
 };
 const socket = io();
 socket.on("message", (message) => {
-  const html = Mustache.render(elements.messageTemplate.innerHTML, { message });
+  const html = Mustache.render(elements.messageTemplate.innerHTML, {
+    message: message.text,
+    timeStamp: moment(message.createdAt).format("h:mm a"),
+  });
   elements.messageList.insertAdjacentHTML("beforeend", html);
 });
-socket.on("locationMessage", (message) => {
-  console.log(message);
+socket.on("locationMessage", (loc) => {
+  const html = Mustache.render(elements.locationTemplate.innerHTML, {
+    location: loc.url,
+    timeStamp: moment(loc.createdAt).format("h:mm a"),
+  });
+  elements.messageList.insertAdjacentHTML("beforeend", html);
 });
 elements.messageForm.addEventListener("submit", (e) => {
   e.preventDefault();
