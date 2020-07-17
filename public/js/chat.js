@@ -1,19 +1,41 @@
-// const socket = io();
-// socket.on("Connection updated", (count) => {
-//   console.log("I received the event", count);
-// });
-
-// document.getElementById("add").addEventListener("click", () => {
-//   socket.emit("increment");
-// });
+const elements = {
+  messageForm: document.querySelector(".message-form"),
+  messageInput: document.querySelector(".message-form input"),
+  locationButton: document.querySelector(".location"),
+  messageTemplate: document.querySelector("#message-template"),
+  messageList: document.querySelector("#message-list"),
+};
 const socket = io();
 socket.on("message", (message) => {
+  const html = Mustache.render(elements.messageTemplate.innerHTML, { message });
+  elements.messageList.insertAdjacentHTML("beforeend", html);
+});
+socket.on("locationMessage", (message) => {
   console.log(message);
 });
-document.querySelector(".message-form").addEventListener("submit", (e) => {
+elements.messageForm.addEventListener("submit", (e) => {
   e.preventDefault();
-  const inputSel = document.querySelector(".message-form input");
-  const value = inputSel.value;
-  inputSel.value = "";
+  const value = elements.messageInput.value;
+  elements.messageInput.value = "";
   socket.emit("sendMessage", value);
+});
+
+elements.locationButton.addEventListener("click", () => {
+  if (!navigator.geolocation) {
+    return alert("Geolocation is not supported by your browser.");
+  }
+  elements.locationButton.setAttribute("disabled", "disabled");
+  navigator.geolocation.getCurrentPosition((position) => {
+    socket.emit(
+      "sendLocation",
+      {
+        latitude: position.coords.latitude,
+        longitude: position.coords.longitude,
+      },
+      () => {
+        elements.locationButton.removeAttribute("disabled");
+        console.log("Location has been shared");
+      }
+    );
+  });
 });

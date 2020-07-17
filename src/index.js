@@ -16,8 +16,16 @@ io.on("connection", (socket) => {
   socket.on("sendMessage", (message) => {
     io.emit("message", message);
   });
+
+  socket.on("sendLocation", (coords, cb) => {
+    io.emit(
+      "locationMessage",
+      `https://google.com/maps?q=${coords.latitude},${coords.longitude}`
+    );
+    cb();
+  });
   socket.on("disconnect", () => {
-    io.prependListener("User has left");
+    io.emit("message", "User has left");
   });
 });
 
