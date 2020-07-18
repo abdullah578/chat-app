@@ -7,6 +7,10 @@ const elements = {
   locationTemplate: document.querySelector("#location-template"),
 };
 const socket = io();
+const { username, room } = Qs.parse(location.search, {
+  ignoreQueryPrefix: true,
+});
+socket.emit("join", { username, room });
 socket.on("message", (message) => {
   const html = Mustache.render(elements.messageTemplate.innerHTML, {
     message: message.text,
