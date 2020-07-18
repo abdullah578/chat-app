@@ -2,9 +2,11 @@ const elements = {
   messageForm: document.querySelector(".message-form"),
   messageInput: document.querySelector(".message-form input"),
   locationButton: document.querySelector(".location"),
+  sideBar: document.querySelector(".chat__sidebar"),
   messageTemplate: document.querySelector("#message-template"),
   messageList: document.querySelector("#message-list"),
   locationTemplate: document.querySelector("#location-template"),
+  sideBarTemplate: document.querySelector("#sideBar-content"),
 };
 const socket = io();
 const { username, room } = Qs.parse(location.search, {
@@ -15,6 +17,10 @@ socket.emit("join", { username, room }, (error) => {
     alert(error);
     location.href = "/";
   }
+});
+socket.on("roomData", (content) => {
+  const html = Mustache.render(elements.sideBarTemplate.innerHTML, content);
+  elements.sideBar.innerHTML = html;
 });
 socket.on("message", (message) => {
   const html = Mustache.render(elements.messageTemplate.innerHTML, {
