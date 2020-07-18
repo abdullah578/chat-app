@@ -22,6 +22,19 @@ socket.on("roomData", (content) => {
   const html = Mustache.render(elements.sideBarTemplate.innerHTML, content);
   elements.sideBar.innerHTML = html;
 });
+const autoScroll = () => {
+  const messages = elements.messageList;
+  const newMessage = messages.lastElementChild;
+  if (!newMessage) return null;
+  const messageStyles = getComputedStyle(newMessage);
+  const newMessageHeight =
+    newMessage.offsetHeight + parseInt(messageStyles.marginBottom);
+  const visibleHeight = messages.offsetHeight;
+  const containerHeight = messages.scrollHeight;
+  const scrollOffset = visibleHeight + messages.scrollTop;
+  if (scrollOffset >= containerHeight - newMessageHeight)
+    messages.scrollTop = containerHeight;
+};
 socket.on("message", (message) => {
   const html = Mustache.render(elements.messageTemplate.innerHTML, {
     message: message.text,
@@ -29,6 +42,7 @@ socket.on("message", (message) => {
     username: message.username,
   });
   elements.messageList.insertAdjacentHTML("beforeend", html);
+  autoScroll();
 });
 socket.on("locationMessage", (loc) => {
   const html = Mustache.render(elements.locationTemplate.innerHTML, {
@@ -37,6 +51,7 @@ socket.on("locationMessage", (loc) => {
     username: message.username,
   });
   elements.messageList.insertAdjacentHTML("beforeend", html);
+  autoScroll();
 });
 elements.messageForm.addEventListener("submit", (e) => {
   e.preventDefault();
