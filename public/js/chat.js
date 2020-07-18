@@ -20,6 +20,7 @@ socket.on("message", (message) => {
   const html = Mustache.render(elements.messageTemplate.innerHTML, {
     message: message.text,
     timeStamp: moment(message.createdAt).format("h:mm a"),
+    username: message.username,
   });
   elements.messageList.insertAdjacentHTML("beforeend", html);
 });
@@ -27,6 +28,7 @@ socket.on("locationMessage", (loc) => {
   const html = Mustache.render(elements.locationTemplate.innerHTML, {
     location: loc.url,
     timeStamp: moment(loc.createdAt).format("h:mm a"),
+    username: message.username,
   });
   elements.messageList.insertAdjacentHTML("beforeend", html);
 });
