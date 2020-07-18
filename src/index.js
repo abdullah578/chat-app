@@ -4,6 +4,13 @@ const http = require("http");
 const socketio = require("socket.io");
 
 const { generateMessage, generateLocationMessage } = require("./utils/utils");
+const {
+  addUsers,
+  removeUser,
+  getUsers,
+  getUsersInRoom,
+} = require("./utils/users");
+const { callbackify } = require("util");
 
 const app = express();
 const server = http.createServer(app);
@@ -17,12 +24,14 @@ io.on("connection", (socket) => {
   socket.on("sendMessage", (message) => {
     io.emit("message", generateMessage(message));
   });
-  socket.on("join", ({ username, room }) => {
-    socket.join(room);
+  socket.on("join", ({ username, room }, cb) => {
+    const { error, user } = addUsers({ id: socket.id, username, room });
+    if (error) return cb(error);
+    socket.join(user.room);
     socket.emit("message", generateMessage("Welcome!"));
     socket.broadcast
-      .to(room)
-      .emit("message", generateMessage(`${username} has joined`));
+      .to(user.room)
+      .emit("message", generateMessage(`${user.username} has joined`));
   });
 
   socket.on("sendLocation", (coords, cb) => {
@@ -35,7 +44,13 @@ io.on("connection", (socket) => {
     cb();
   });
   socket.on("disconnect", () => {
-    io.emit("message", generateMessage("User has left"));
+    const user = removeUser(socket.id);
+
+    if (user)
+      io.to(user.room).emit(
+        "message",
+        generateMessage(`${user.username} has left`)
+      );
   });
 });
 
