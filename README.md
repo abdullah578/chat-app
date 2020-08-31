@@ -14,7 +14,7 @@ Visit: [chat-app](https://abdullah-ansar-chat-app.herokuapp.com)
 ## Built With
 
 - HTML,CSS,Vanilla JS,Mustache- Used to create the user interface
-- Node,Express - Used to create a restful API
+- Node,Express - Used to create a web server
 - Socket.io-Used to facilitate real time communication between client and server
 - npm - Used to handle packaging and dependencies
 
